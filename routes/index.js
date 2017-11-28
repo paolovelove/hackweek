@@ -8,7 +8,7 @@ var stream = null;
 var currentKeyword = null;
 var sentimentTotal = 0;
 var tweets = 0;
-var percentage = {negative:0, neutral:0, positive:0};
+var percentage = {negative: 0, neutral: 0, positive: 0};
 var client = new twitter({
     consumer_key: process.env.TWITTER_KEY,
     consumer_secret: process.env.TWITTER_SECRET,
@@ -26,7 +26,7 @@ function initStream(keyword) {
             sentiment(data.text, function (err, result) {
                 tweets++;
                 sentimentTotal += result.score;
-                if(result.score > 1)
+                if (result.score > 1)
                     percentage.positive++;
                 else if (result.score > -1)
                     percentage.neutral++;
@@ -38,9 +38,9 @@ function initStream(keyword) {
 }
 
 function destroyStream() {
-    if(stream){
+    if (stream) {
         stream.destroy();
-        stream=null;
+        stream = null;
         console.log("Stream destroy");
     }
     currentKeyword = '';
@@ -51,11 +51,10 @@ function destroyStream() {
 
 router.post('/results', function (req, res, next) {
 
-    if(req.body.keyword !== currentKeyword)
-    {
+    if (req.body.keyword !== currentKeyword) {
         destroyStream();
         initStream(req.body.keyword);
-        setTimeout(destroyStream, 1000*(60*2));
+        setTimeout(destroyStream, 1000 * (60 * 2));
     }
     const data = {
         keyword: currentKeyword,
