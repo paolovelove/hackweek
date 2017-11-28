@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tude Tracker 2.0 - Home</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div id="formSection">
+    <section>
+        <div class="content">
+            <h2>How does people feel on Twitter?</h2>
+            <form id="form">
+                <p>
+                    Keyword:
+                    <input type="text" name="keyword" id="keyword" required autocomplete="off" autofocus="autofocus"
+                           aria-required="true">
+                </p>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </section>
+    <!--<footer>-->
+    <!--Made by NodeJS, ExpressJS, and Sentiment-->
+    <!--</footer>-->
+</div>
+
+<div id="resultsSection" style="display: none;">
+    <section>
+        <div class="content clearfix">
+            <div class="half-col">
+                <h1 id="topic" class="result"></h1>
+                <h2 class="result">total tweets: <span id="tweets"></span></h2>
+                <h2 class="result">sentiment: <span id="sentiment"></span></h2>
+            </div>
+            <div class="half-col">
+                <br>
+                <br>
+                <br>
+                <h2 class="result"># of tweets:</h2>
+                <div class="bar clearfix" id="negative">
+                    <div class="bar-title"><span>NEGATIVE</span></div>
+                    <div class="bar-bar" style="background: #ED6151;"></div>
+                    <div class="bar-percent">0</div>
+                </div>
+                <div class="bar clearfix" id="neutral">
+                    <div class="bar-title"><span>NEUTRAL</span></div>
+                    <div class="bar-bar" style="background: #F8C735;"></div>
+                    <div class="bar-percent">0</div>
+                </div>
+                <div class="bar clearfix" id="positive">
+                    <div class="bar-title"><span>POSITIVE</span></div>
+                    <div class="bar-bar" style="background: #11D883;"></div>
+                    <div class="bar-percent">0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    $("#form").on('submit', function (e) {
+        var count = 0;
+        if (e) {
+            e.preventDefault();
+        }
+        $("#formSection").hide();
+        $("#resultsSection").show();
+
+        //set an interval to run the function every half second to refresh results
+        setInterval(function () {
+            var topic = $("#keyword").val();
+
+            $.ajax({
+                method: "POST",
+                data: {keyword: topic},
+                url: "/results",
+                success: function (data) {
+                    count += 500;
+                    var jsonData = JSON.parse(data);
+                    var bar = jsonData.percentage;
+                    $('#topic').html(jsonData.keyword);
+                    $('#tweets').html(jsonData.tweets);
+                    $('#sentiment').html(jsonData.sentiment.toFixed(4));
+
+                    if (count % 5000 == 0) {
+
+                        $('#negative .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
+                        $('#negative .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+
+                        $('#positive .bar-bar').animate({width: (bar.positive * 100) / jsonData.tweets + '%'}, 1000);
+                        $('#positive .bar-percent').text(((bar.positive * 100) / jsonData.tweets).toFixed(0));
+
+                        $('#neutral .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
+                        $('#neutral .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+                    }
+                }
+            });
+        }, 500);
+    });
+</script>
+</body>
+</html>
