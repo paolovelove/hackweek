@@ -10,20 +10,25 @@
 <div id="formSection">
     <section>
         <div class="content">
-            <h2>How does people feel on Twitter?</h2>
+            <h2>How do people feel on Twitter?</h2>
             <form id="form">
+                <% if(keyword) { %>
+                <p>
+                    We are working on #
+                    <input type="text" name="keyword" id="keyword" value="<%= keyword %>" readonly>
+                </p>
+                <button type="submit">Show</button>
+                <% } else{ %>
                 <p>
                     Keyword:
                     <input type="text" name="keyword" id="keyword" required autocomplete="off" autofocus="autofocus"
                            aria-required="true">
+                    <button type="submit" class="hidden">Submit</button>
                 </p>
-                <button type="submit">Submit</button>
+                <% } %>
             </form>
         </div>
     </section>
-    <!--<footer>-->
-    <!--Made by NodeJS, ExpressJS, and Sentiment-->
-    <!--</footer>-->
 </div>
 
 <div id="resultsSection" style="display: none;">
@@ -69,35 +74,39 @@
         $("#resultsSection").show();
 
         //set an interval to run the function every half second to refresh results
-        setInterval(function () {
+        var getResult = setInterval(function () {
             var topic = $("#keyword").val();
+            if(count < 1000*(90))
+            {
+                $.ajax({
+                    method: "POST",
+                    data: {keyword: topic},
+                    url: "/results",
+                    success: function (data) {
+                        count += 500;
+                        var jsonData = JSON.parse(data);
+                        var bar = jsonData.percentage;
+                        $('#topic').html(jsonData.keyword);
+                        $('#tweets').html(jsonData.tweets);
+                        $('#sentiment').html(jsonData.sentiment.toFixed(4));
 
-            $.ajax({
-                method: "POST",
-                data: {keyword: topic},
-                url: "/results",
-                success: function (data) {
-                    count += 500;
-                    var jsonData = JSON.parse(data);
-                    var bar = jsonData.percentage;
-                    $('#topic').html(jsonData.keyword);
-                    $('#tweets').html(jsonData.tweets);
-                    $('#sentiment').html(jsonData.sentiment.toFixed(4));
+                        if (count % 3000 == 0) {
 
-                    if (count % 5000 == 0) {
+                            $('#negative .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
+                            $('#negative .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
 
-                        $('#negative .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
-                        $('#negative .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+                            $('#positive .bar-bar').animate({width: (bar.positive * 100) / jsonData.tweets + '%'}, 1000);
+                            $('#positive .bar-percent').text(((bar.positive * 100) / jsonData.tweets).toFixed(0));
 
-                        $('#positive .bar-bar').animate({width: (bar.positive * 100) / jsonData.tweets + '%'}, 1000);
-                        $('#positive .bar-percent').text(((bar.positive * 100) / jsonData.tweets).toFixed(0));
-
-                        $('#neutral .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
-                        $('#neutral .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+                            $('#neutral .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
+                            $('#neutral .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+                        }
                     }
-                }
-            });
+                });
+            }
         }, 500);
+
+
     });
 </script>
 </body>
