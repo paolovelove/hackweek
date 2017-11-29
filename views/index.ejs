@@ -124,8 +124,8 @@
                                 $('#positive .bar-bar').animate({width: (bar.positive * 100) / jsonData.tweets + '%'}, 1000);
                                 $('#positive .bar-percent').text(((bar.positive * 100) / jsonData.tweets).toFixed(0));
 
-                                $('#neutral .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
-                                $('#neutral .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+                                $('#neutral .bar-bar').animate({width: (bar.neutral * 100) / jsonData.tweets + '%'}, 1000);
+                                $('#neutral .bar-percent').text(((bar.neutral * 100) / jsonData.tweets).toFixed(0));
 
                                 powerGauge.update(jsonData.sentiment.toFixed(4));
                                 updateText(jsonData.sentiment.toFixed(4));
