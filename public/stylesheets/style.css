@@ -86,7 +86,16 @@ h2 {
     color: white;
     font-weight: 300;
 }
-
+h3 {
+    font-size: 1.5em;
+    display: block;
+    color: white;
+    font-weight: 300;
+}
+h3#sentimentText{
+    margin-top: 0px;
+    text-align: center;
+}
 h1.result {
     font-size: 9em;
     display: block;
@@ -116,6 +125,11 @@ a:hover {
 
 a:active {
     top: 1px;
+}
+
+hr{
+    border: solid 1px #ececec;
+    margin: 20px 0;
 }
 
 footer {
@@ -211,4 +225,25 @@ footer a {
     content: "";
     clear: both;
     display: table;
+}
+
+#power-gauge{
+    margin-top: 30px;
+}
+
+#power-gauge g.arc {
+    fill: steelblue;
+    margin-bottom: 0px;
+}
+
+#power-gauge g.pointer {
+    fill: white;
+    stroke: white;
+}
+
+#power-gauge g.label text {
+    text-anchor: middle;
+    font-size: 14px;
+    font-weight: bold;
+    fill: white;
 }

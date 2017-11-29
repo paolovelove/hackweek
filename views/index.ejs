@@ -59,54 +59,84 @@
                     <div class="bar-bar" style="background: #11D883;"></div>
                     <div class="bar-percent">0</div>
                 </div>
+                <hr>
+                <div id="power-gauge" align="center">
+                </div>
+                <h3 id="sentimentText"></h3>
             </div>
         </div>
     </section>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="javascripts/gauge.js"></script>
+
 <script>
-    $("#form").on('submit', function (e) {
-        var count = 0;
-        if (e) {
-            e.preventDefault();
-        }
-        $("#formSection").hide();
-        $("#resultsSection").show();
+    var powerGauge = gauge('#power-gauge', {
+        size: 300,
+        clipWidth: 300,
+        clipHeight: 180,
+        ringWidth: 60,
+        transitionMs: 4000
+    });
 
-        //set an interval to run the function every half second to refresh results
-        var getResult = setInterval(function () {
-            var topic = $("#keyword").val();
-            if(count < 1000*(90))
-            {
-                $.ajax({
-                    method: "POST",
-                    data: {keyword: topic},
-                    url: "/results",
-                    success: function (data) {
-                        count += 500;
-                        var jsonData = JSON.parse(data);
-                        var bar = jsonData.percentage;
-                        $('#topic').html(jsonData.keyword);
-                        $('#tweets').html(jsonData.tweets);
-                        $('#sentiment').html(jsonData.sentiment.toFixed(4));
+    function updateText(sentiment) {
+        if(sentiment > 0.5)
+            $('#sentimentText').html("Positive");
+        else if(sentiment > -0.5)
+            $('#sentimentText').html("Neutral");
+        else
+            $('#sentimentText').html("Negative");
+    }
 
-                        if (count % 3000 == 0) {
-
-                            $('#negative .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
-                            $('#negative .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
-
-                            $('#positive .bar-bar').animate({width: (bar.positive * 100) / jsonData.tweets + '%'}, 1000);
-                            $('#positive .bar-percent').text(((bar.positive * 100) / jsonData.tweets).toFixed(0));
-
-                            $('#neutral .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
-                            $('#neutral .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
-                        }
-                    }
-                });
+    $(document).ready(function () {
+        powerGauge.render();
+        powerGauge.update(0);
+        $("#form").on('submit', function (e) {
+            var count = 0;
+            if (e) {
+                e.preventDefault();
             }
-        }, 500);
+            $("#formSection").hide();
+            $("#resultsSection").show();
+
+            //set an interval to run the function every half second to refresh results
+            var getResult = setInterval(function () {
+                var topic = $("#keyword").val();
+                if (count < 1000 * (90)) {
+                    $.ajax({
+                        method: "POST",
+                        data: {keyword: topic},
+                        url: "/results",
+                        success: function (data) {
+                            count += 500;
+                            var jsonData = data;
+                            var bar = jsonData.percentage;
+                            $('#topic').html(jsonData.keyword);
+                            $('#tweets').html(jsonData.tweets);
+                            $('#sentiment').html(jsonData.sentiment.toFixed(4));
+
+                            if (count % 2000 == 0) {
+
+                                $('#negative .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
+                                $('#negative .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+
+                                $('#positive .bar-bar').animate({width: (bar.positive * 100) / jsonData.tweets + '%'}, 1000);
+                                $('#positive .bar-percent').text(((bar.positive * 100) / jsonData.tweets).toFixed(0));
+
+                                $('#neutral .bar-bar').animate({width: (bar.negative * 100) / jsonData.tweets + '%'}, 1000);
+                                $('#neutral .bar-percent').text(((bar.negative * 100) / jsonData.tweets).toFixed(0));
+
+                                powerGauge.update(jsonData.sentiment.toFixed(4));
+                                updateText(jsonData.sentiment.toFixed(4));
+                            }
+                        }
+                    });
+                }
+            }, 500);
 
 
+        });
     });
 </script>
 </body>

@@ -44,7 +44,7 @@ function destroyStream() {
         stream = null;
         console.log("Stream destroy");
     }
-    currentKeyword = null;
+    currentKeyword = '';
     sentimentTotal = 0;
     tweets = 0;
     percentage.negative = percentage.neutral = percentage.positive = 0;
@@ -63,6 +63,7 @@ router.post('/results', function (req, res, next) {
         tweets: tweets,
         percentage: percentage
     };
+    res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(data));
 });
 
