@@ -81,9 +81,9 @@
     });
 
     function updateText(sentiment) {
-        if(sentiment > 0.5)
+        if(sentiment > 1)
             $('#sentimentText').html("Positive");
-        else if(sentiment > -0.5)
+        else if(sentiment > -1)
             $('#sentimentText').html("Neutral");
         else
             $('#sentimentText').html("Negative");
